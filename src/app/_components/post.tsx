@@ -24,6 +24,8 @@ export function LatestPost() {
           createPost.mutate({
             content,
             authorId: "temp", // Replace with Clerk user.id in real use
+            authorName: null,
+            authorImage: null,
           });
         }}
         className="flex flex-col gap-2"
