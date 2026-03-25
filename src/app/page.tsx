@@ -10,7 +10,6 @@ import Head from "next/head";
 import { SignInButton, SignOutButton, useUser } from "@clerk/nextjs";
 
 import { api } from "~/trpc/react";
-import type { InfiniteData } from "@tanstack/react-query";
 import type { PostWithUser } from "~/server/api/routers/posts";
 
 dayjs.extend(relativeTime);
@@ -102,7 +101,6 @@ const CreatePostWizard = () => {
     onSuccess: async () => {
       setContent("");
       toast.success("Posted!");
-      // Refetch to replace temp post with real one
       await ctx.posts.infinite.invalidate();
     },
   });
@@ -143,7 +141,6 @@ const CreatePostWizard = () => {
           placeholder="What's on your mind? (Enter to post)"
         />
         <div className="flex items-center justify-between">
-          {/* Character counter */}
           <span className={`text-xs ${isOverLimit ? "text-red-400" : remaining <= 50 ? "text-yellow-400" : "text-slate-500"}`}>
             {remaining} characters remaining
           </span>
@@ -161,7 +158,7 @@ const CreatePostWizard = () => {
 };
 
 // -------------------- Like Button --------------------
-const LikeButton = ({ postId }: { postId: string }) => {
+const LikeButton = ({ postId: _postId }: { postId: string }) => {
   const [liked, setLiked] = useState(false);
   const [count, setCount] = useState(0);
 
@@ -173,13 +170,11 @@ const LikeButton = ({ postId }: { postId: string }) => {
   return (
     <button
       onClick={handleLike}
-      className={`flex items-center gap-1.5 text-xs transition-all group ${liked ? "text-pink-400" : "text-slate-500 hover:text-pink-400"
-        }`}
+      className={`flex items-center gap-1.5 text-xs transition-all group ${liked ? "text-pink-400" : "text-slate-500 hover:text-pink-400"}`}
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`h-4 w-4 transition-transform group-active:scale-125 ${liked ? "fill-pink-400" : "fill-none"
-          }`}
+        className={`h-4 w-4 transition-transform group-active:scale-125 ${liked ? "fill-pink-400" : "fill-none"}`}
         viewBox="0 0 24 24"
         stroke="currentColor"
         strokeWidth={2}
@@ -201,7 +196,6 @@ const PostView = ({ id, content, createdAt, createdBy }: PostWithUser) => {
   const ctx = api.useContext();
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(content);
-  const isOwner = user?.id === createdBy.id || true; // will refine once clerkId is on createdBy
 
   const { mutate: deletePost, status: deleteStatus } = api.posts.delete.useMutation({
     onSuccess: () => {
@@ -245,7 +239,6 @@ const PostView = ({ id, content, createdAt, createdBy }: PostWithUser) => {
             <span className="text-xs text-slate-500">{dayjs(createdAt).fromNow()}</span>
           </div>
 
-          {/* Action buttons — only visible on hover */}
           {user && (
             <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
               <button
@@ -278,7 +271,6 @@ const PostView = ({ id, content, createdAt, createdBy }: PostWithUser) => {
           )}
         </div>
 
-        {/* Edit mode */}
         {isEditing ? (
           <div className="flex flex-col gap-2 mt-1">
             <textarea
@@ -381,7 +373,6 @@ export default function Home() {
           <div className="sticky top-0 z-10 flex items-center justify-between border-b border-slate-700 bg-slate-900/80 px-4 py-3 backdrop-blur-sm">
             <h1 className="font-bold text-white text-lg">Feed</h1>
             <div className="flex items-center gap-3">
-              {/* User pill */}
               <div className="flex items-center gap-2 rounded-full border border-slate-700 bg-slate-800 px-3 py-1.5">
                 <Image
                   src={user.imageUrl ?? ""}
@@ -432,7 +423,6 @@ export default function Home() {
     </>
   );
 }
-
 
 // "use client";
 

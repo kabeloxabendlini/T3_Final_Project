@@ -8,8 +8,9 @@ import SuperJSON from "superjson";
 
 import type { AppRouter } from "~/server/api/root";
 import { createQueryClient } from "./query-client";
+import type { QueryClient } from "@tanstack/react-query";
 
-let clientQueryClientSingleton: any;
+let clientQueryClientSingleton: QueryClient | undefined;
 
 const getQueryClient = () => {
   if (typeof window === "undefined") return createQueryClient();
