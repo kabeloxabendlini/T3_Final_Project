@@ -157,36 +157,90 @@ const CreatePostWizard = () => {
   );
 };
 
-// -------------------- Like Button --------------------
-const LikeButton = ({ postId: _postId }: { postId: string }) => {
-  const [liked, setLiked] = useState(false);
-  const [count, setCount] = useState(0);
+// -------------------- Like/Dislike Buttons --------------------
+const LikeDislikeButtons = ({ postId: _postId }: { postId: string }) => {
+  const [vote, setVote] = useState<"like" | "dislike" | null>(null);
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
 
   const handleLike = () => {
-    setLiked((prev) => !prev);
-    setCount((prev) => (liked ? prev - 1 : prev + 1));
+    if (vote === "like") {
+      // Unlike
+      setVote(null);
+      setLikes((prev) => prev - 1);
+    } else {
+      // Like — remove dislike if active
+      if (vote === "dislike") setDislikes((prev) => prev - 1);
+      setVote("like");
+      setLikes((prev) => prev + 1);
+    }
+  };
+
+  const handleDislike = () => {
+    if (vote === "dislike") {
+      // Un-dislike
+      setVote(null);
+      setDislikes((prev) => prev - 1);
+    } else {
+      // Dislike — remove like if active
+      if (vote === "like") setLikes((prev) => prev - 1);
+      setVote("dislike");
+      setDislikes((prev) => prev + 1);
+    }
   };
 
   return (
-    <button
-      onClick={handleLike}
-      className={`flex items-center gap-1.5 text-xs transition-all group ${liked ? "text-pink-400" : "text-slate-500 hover:text-pink-400"}`}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        className={`h-4 w-4 transition-transform group-active:scale-125 ${liked ? "fill-pink-400" : "fill-none"}`}
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        strokeWidth={2}
+    <div className="flex items-center gap-3 mt-1">
+      {/* Like Button */}
+      <button
+        onClick={handleLike}
+        className={`flex items-center gap-1.5 text-xs transition-all group ${
+          vote === "like" ? "text-emerald-400" : "text-slate-500 hover:text-emerald-400"
+        }`}
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-        />
-      </svg>
-      <span>{count > 0 ? count : ""}</span>
-    </button>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-4 w-4 transition-transform group-active:scale-125 ${
+            vote === "like" ? "fill-emerald-400" : "fill-none"
+          }`}
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"
+          />
+        </svg>
+        <span>{likes > 0 ? likes : ""}</span>
+      </button>
+
+      {/* Dislike Button */}
+      <button
+        onClick={handleDislike}
+        className={`flex items-center gap-1.5 text-xs transition-all group ${
+          vote === "dislike" ? "text-red-400" : "text-slate-500 hover:text-red-400"
+        }`}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className={`h-4 w-4 transition-transform group-active:scale-125 ${
+            vote === "dislike" ? "fill-red-400" : "fill-none"
+          }`}
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M10 14H5.236a2 2 0 01-1.789-2.894l3.5-7A2 2 0 018.736 3h4.018a2 2 0 01.485.06l3.76.94m-7 10v5a2 2 0 002 2h.095c.5 0 .905-.405.905-.905 0-.714.211-1.412.608-2.006L17 13V4m-7 10h2m5-10h2a2 2 0 012 2v6a2 2 0 01-2 2h-2.5"
+          />
+        </svg>
+        <span>{dislikes > 0 ? dislikes : ""}</span>
+      </button>
+    </div>
   );
 };
 
@@ -299,9 +353,8 @@ const PostView = ({ id, content, createdAt, createdBy }: PostWithUser) => {
           <span className="text-slate-300 text-sm break-words leading-relaxed">{content}</span>
         )}
 
-        <div className="mt-1">
-          <LikeButton postId={id} />
-        </div>
+        {/* Like / Dislike Buttons */}
+        <LikeDislikeButtons postId={id} />
       </div>
     </div>
   );
